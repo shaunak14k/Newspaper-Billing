@@ -1,0 +1,519 @@
+import Project.ConnectionProvider;
+import javax.swing.*;
+import java.sql.*;
+import java.text.SimpleDateFormat;
+import net.proteanit.sql.DbUtils;
+import javax.swing.JOptionPane;
+
+import java.awt.Toolkit;
+import static java.lang.Character.isDigit;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import javax.swing.JOptionPane;
+import java.time.*;
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/**
+ *
+ * @author shaun
+ */
+public class HomeGeneralAdmin extends javax.swing.JFrame {
+
+    /**
+     * Creates new form HomeGeneralAdmin
+     */
+    
+     public int showList = 1;
+    /**
+     * Creates new form Home
+     */
+    
+    String adminUsername="", adminName="";
+    
+    public HomeGeneralAdmin(String admin_username) {
+        initComponents();
+        
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("billingICON.png")));
+        
+        adminUsername = admin_username;
+        
+        //Fetch admin name
+        try
+        {
+            Connection con = ConnectionProvider.getCon();
+            Statement st = con.createStatement();
+            ResultSet rs;
+            
+            rs = st.executeQuery("select admin_name from Admin where admin_username='"+adminUsername+"'");
+            if(rs.next())
+            {
+                adminNameLabel.setText(rs.getString(1));
+            }
+        }
+        catch(Exception e)
+        {
+            JOptionPane.showMessageDialog(null, e);
+        }
+        
+        
+        setResizable(false);
+        //Allign at center of screen
+        //setLocationRelativeTo(null);
+        
+        System.out.println("HERE !");
+        //CHECK FOR PENDING BILL STATUS
+         Date billStartDate = null;
+         String subscriptionStatus;
+         String billPending;
+         String subscriptionID[] = new String[100];
+         
+         int noOfSubscriptions = 0;
+         
+         try
+         {
+             System.out.println("HERE !!");
+            Connection con = ConnectionProvider.getCon();
+            Statement st = con.createStatement();
+            ResultSet rs;
+         //System.out.println("HERE !!");
+            //Number of subscriptions
+            rs = st.executeQuery("select count(subscription_id) from customer_newspaper");
+            if(rs.next())
+            {
+                noOfSubscriptions = rs.getInt(1);
+                System.out.println(noOfSubscriptions);
+            }
+            for(int i=1; i<=noOfSubscriptions; i++)
+            {
+                //System.out.println("HERE !!");
+                rs = st.executeQuery("select bill_start_date, subscription_status, bill_pending from customer_newspaper where subscription_id = '"+i+"'");
+                //int index=0;
+                if(rs.next())
+                {
+                    billStartDate = rs.getDate(1);
+                    subscriptionStatus = rs.getString(2);
+                    billPending = rs.getString(3);
+
+                    //If subscription is active
+                    if(subscriptionStatus.equals("Active"))
+                    {
+                        System.out.println("HERE Active!!"+i);
+                        SimpleDateFormat dFormat = new SimpleDateFormat("yyyy-MM-dd");
+                        Date currentDateDate = new Date();
+                        dFormat.format(currentDateDate);
+                        String currentDate = dFormat.format(currentDateDate);
+                        
+                        //If todays date is not the date of previous billing the bill is pending , bill_pending= YES
+                        if(billStartDate.before(currentDateDate))
+                        {
+                            System.out.println("HERE !!! dates match");
+                            try
+                            {
+                                st.executeUpdate("update customer_newspaper set bill_pending='Yes' where subscription_id='"+i+"'");
+                        
+                            }
+                            catch(Exception e)
+                            {
+                                System.out.println(e);
+                            }
+                                
+                        }
+
+                    }
+                }
+             
+            }//end of try
+            
+         }
+         catch(Exception e)
+        {
+
+        }
+        
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        newspaperDetailsButton = new javax.swing.JButton();
+        newspaperLabel = new javax.swing.JLabel();
+        backButton = new javax.swing.JButton();
+        newsDetailsLabel = new javax.swing.JLabel();
+        logoutLabel = new javax.swing.JLabel();
+        listButton = new javax.swing.JButton();
+        customerDetailsButton = new javax.swing.JButton();
+        customerDetailsLabel = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JSeparator();
+        jSeparator2 = new javax.swing.JSeparator();
+        jSeparator3 = new javax.swing.JSeparator();
+        jSeparator4 = new javax.swing.JSeparator();
+        jSeparator5 = new javax.swing.JSeparator();
+        jSeparator6 = new javax.swing.JSeparator();
+        detailsLabel = new javax.swing.JLabel();
+        billingButton = new javax.swing.JButton();
+        billingLabel = new javax.swing.JLabel();
+        subscriptionDetailsButton = new javax.swing.JButton();
+        subscriptionDetailsLabel = new javax.swing.JLabel();
+        jSeparator7 = new javax.swing.JSeparator();
+        jSeparator8 = new javax.swing.JSeparator();
+        closeButton = new javax.swing.JButton();
+        closeLabel = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        adminNameLabel = new javax.swing.JLabel();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setLocation(new java.awt.Point(60, 30));
+        setMaximumSize(new java.awt.Dimension(1395, 800));
+        setMinimumSize(new java.awt.Dimension(1395, 800));
+        setUndecorated(true);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        newspaperDetailsButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/product_details.png"))); // NOI18N
+        newspaperDetailsButton.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentShown(java.awt.event.ComponentEvent evt) {
+                newspaperDetailsButtonComponentShown(evt);
+            }
+        });
+        newspaperDetailsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                newspaperDetailsButtonActionPerformed(evt);
+            }
+        });
+        getContentPane().add(newspaperDetailsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(830, 20, -1, -1));
+
+        newspaperLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        newspaperLabel.setText("Newspaper");
+        getContentPane().add(newspaperLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 100, -1, 20));
+
+        backButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/go_back.png"))); // NOI18N
+        backButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backButtonActionPerformed(evt);
+            }
+        });
+        getContentPane().add(backButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1130, 20, -1, -1));
+
+        newsDetailsLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        newsDetailsLabel.setText("Details");
+        getContentPane().add(newsDetailsLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(850, 120, 50, -1));
+
+        logoutLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        logoutLabel.setText("Go Back");
+        getContentPane().add(logoutLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(1150, 100, -1, 20));
+
+        listButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/show_list.png"))); // NOI18N
+        listButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                listButtonMouseClicked(evt);
+            }
+        });
+        listButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                listButtonActionPerformed(evt);
+            }
+        });
+        getContentPane().add(listButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 30, 80, -1));
+
+        customerDetailsButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/customer_details.png"))); // NOI18N
+        customerDetailsButton.setToolTipText("");
+        customerDetailsButton.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentShown(java.awt.event.ComponentEvent evt) {
+                customerDetailsButtonComponentShown(evt);
+            }
+        });
+        customerDetailsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                customerDetailsButtonActionPerformed(evt);
+            }
+        });
+        getContentPane().add(customerDetailsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 20, -1, 70));
+
+        customerDetailsLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        customerDetailsLabel.setText("Customer ");
+        getContentPane().add(customerDetailsLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 100, 70, 20));
+        getContentPane().add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 150, 1330, 10));
+
+        jSeparator2.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        getContentPane().add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 10, 20, 120));
+
+        jSeparator3.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        getContentPane().add(jSeparator3, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 10, 20, 120));
+
+        jSeparator4.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        getContentPane().add(jSeparator4, new org.netbeans.lib.awtextra.AbsoluteConstraints(1110, 10, 20, 120));
+
+        jSeparator5.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        getContentPane().add(jSeparator5, new org.netbeans.lib.awtextra.AbsoluteConstraints(1250, 10, 20, 120));
+
+        jSeparator6.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        getContentPane().add(jSeparator6, new org.netbeans.lib.awtextra.AbsoluteConstraints(1250, 10, 20, 120));
+
+        detailsLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        detailsLabel.setText("Details");
+        getContentPane().add(detailsLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 120, -1, -1));
+
+        billingButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/billing_icon.png"))); // NOI18N
+        billingButton.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentShown(java.awt.event.ComponentEvent evt) {
+                billingButtonComponentShown(evt);
+            }
+        });
+        billingButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                billingButtonActionPerformed(evt);
+            }
+        });
+        getContentPane().add(billingButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 180, -1, -1));
+
+        billingLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        billingLabel.setText("BILLING");
+        getContentPane().add(billingLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 250, -1, 30));
+
+        subscriptionDetailsButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/subscription_details.png"))); // NOI18N
+        subscriptionDetailsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                subscriptionDetailsButtonActionPerformed(evt);
+            }
+        });
+        getContentPane().add(subscriptionDetailsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 320, -1, 70));
+
+        subscriptionDetailsLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        subscriptionDetailsLabel.setText("Subscription Details");
+        getContentPane().add(subscriptionDetailsLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 400, -1, -1));
+        getContentPane().add(jSeparator7, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 440, 130, 20));
+        getContentPane().add(jSeparator8, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 290, 130, 20));
+
+        closeButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/close_app.png"))); // NOI18N
+        closeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                closeButtonActionPerformed(evt);
+            }
+        });
+        getContentPane().add(closeButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(1270, 20, -1, -1));
+
+        closeLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        closeLabel.setText("Close ");
+        getContentPane().add(closeLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(1300, 90, -1, 30));
+
+        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel1.setText("Admin Name   : ");
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 760, -1, -1));
+
+        adminNameLabel.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        adminNameLabel.setText("admin_name");
+        getContentPane().add(adminNameLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 760, -1, -1));
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void newspaperDetailsButtonComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_newspaperDetailsButtonComponentShown
+        // TODO add your handling code here:
+    }//GEN-LAST:event_newspaperDetailsButtonComponentShown
+
+    private void newspaperDetailsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newspaperDetailsButtonActionPerformed
+        // TODO add your handling code here:
+        //Call the new customer class (Frame)
+        new NewspaperDetails().setVisible(true);
+    }//GEN-LAST:event_newspaperDetailsButtonActionPerformed
+
+    private void backButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backButtonActionPerformed
+        // TODO add your handling code here:
+        int logout = JOptionPane.showConfirmDialog(null,"Do you want to go back ?","Select",JOptionPane.YES_NO_OPTION);
+        if(logout==0)
+        {
+            setVisible(false);
+
+            try
+            {
+                Connection con = ConnectionProvider.getCon();
+                Statement st1 = con.createStatement();
+                ResultSet rs;
+
+                rs = st1.executeQuery("select is_superadmin from Admin where admin_username='"+adminUsername+"'");
+                if(rs.next())
+                {
+                    if(rs.getString(1).equals("Yes"))
+                    {
+                        new SuperAdminLogin(adminUsername).setVisible(true);
+                    }
+                    else
+                    {
+                        new LoginWelcome(adminUsername).setVisible(true);
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                JOptionPane.showMessageDialog(null, e);
+            }
+        }
+    }//GEN-LAST:event_backButtonActionPerformed
+
+    private void listButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_listButtonMouseClicked
+        // TODO add your handling code here:
+        if(showList == 0)
+        {
+            //Show all the buttons and labels
+            
+            customerDetailsButton.setVisible(true);
+            
+            newspaperDetailsButton.setVisible(true);
+           
+            subscriptionDetailsButton.setVisible(true);
+           
+            customerDetailsLabel.setVisible(true);
+            detailsLabel.setVisible(true);
+
+            newspaperLabel.setVisible(true);
+            newsDetailsLabel.setVisible(true);
+            
+            subscriptionDetailsLabel.setVisible(true);
+            
+
+            showList = 1;
+
+        }
+        else
+        {
+            //Hide visibility of all buttons and Labels
+           
+            customerDetailsButton.setVisible(false);
+          
+            newspaperDetailsButton.setVisible(false);
+          
+            subscriptionDetailsButton.setVisible(false);
+         
+           
+            customerDetailsLabel.setVisible(false);
+            detailsLabel.setVisible(false);
+          
+            newspaperLabel.setVisible(false);
+            newsDetailsLabel.setVisible(false);
+        
+            subscriptionDetailsLabel.setVisible(false);
+          
+            showList = 0;
+        }
+
+    }//GEN-LAST:event_listButtonMouseClicked
+
+    private void listButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listButtonActionPerformed
+        // TODO add your handling code here:
+
+    }//GEN-LAST:event_listButtonActionPerformed
+
+    private void customerDetailsButtonComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_customerDetailsButtonComponentShown
+        // TODO add your handling code here:
+
+    }//GEN-LAST:event_customerDetailsButtonComponentShown
+
+    private void customerDetailsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_customerDetailsButtonActionPerformed
+        // TODO add your handling code here:
+        new CustomerDetails().setVisible(true);
+    }//GEN-LAST:event_customerDetailsButtonActionPerformed
+
+    private void billingButtonComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_billingButtonComponentShown
+        // TODO add your handling code here:
+    }//GEN-LAST:event_billingButtonComponentShown
+
+    private void billingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_billingButtonActionPerformed
+        // TODO add your handling code here:
+        new Billing().setVisible(true);
+    }//GEN-LAST:event_billingButtonActionPerformed
+
+    private void subscriptionDetailsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_subscriptionDetailsButtonActionPerformed
+        // TODO add your handling code here:
+        new SubscriptionDetails().setVisible(true);
+    }//GEN-LAST:event_subscriptionDetailsButtonActionPerformed
+
+    private void closeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeButtonActionPerformed
+        // TODO add your handling code here:
+        int logout = JOptionPane.showConfirmDialog(null,"Do you want to Exit","Select",JOptionPane.YES_NO_OPTION);
+        if(logout==0)
+        {
+            System.exit(0);
+        }
+    }//GEN-LAST:event_closeButtonActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(HomeGeneralAdmin.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(HomeGeneralAdmin.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(HomeGeneralAdmin.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(HomeGeneralAdmin.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new HomeGeneralAdmin("").setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel adminNameLabel;
+    private javax.swing.JButton backButton;
+    private javax.swing.JButton billingButton;
+    private javax.swing.JLabel billingLabel;
+    private javax.swing.JButton closeButton;
+    private javax.swing.JLabel closeLabel;
+    private javax.swing.JButton customerDetailsButton;
+    private javax.swing.JLabel customerDetailsLabel;
+    private javax.swing.JLabel detailsLabel;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JSeparator jSeparator3;
+    private javax.swing.JSeparator jSeparator4;
+    private javax.swing.JSeparator jSeparator5;
+    private javax.swing.JSeparator jSeparator6;
+    private javax.swing.JSeparator jSeparator7;
+    private javax.swing.JSeparator jSeparator8;
+    private javax.swing.JButton listButton;
+    private javax.swing.JLabel logoutLabel;
+    private javax.swing.JLabel newsDetailsLabel;
+    private javax.swing.JButton newspaperDetailsButton;
+    private javax.swing.JLabel newspaperLabel;
+    private javax.swing.JButton subscriptionDetailsButton;
+    private javax.swing.JLabel subscriptionDetailsLabel;
+    // End of variables declaration//GEN-END:variables
+}
